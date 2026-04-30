@@ -1,12 +1,785 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LVO Alliance · Partnerships</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+  <script
+    async
+    crossorigin="anonymous"
+    data-clerk-publishable-key="pk_live_Y2xlcmsud2VhcmVsdm8uY29tJA"
+    src="https://secure-bengal-25.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+    type="text/javascript"
+  ></script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --red: #8B0000; --red-hi: #CC2020;
+      --chrome: #C8C8D0; --white: #F0EEEC;
+      --dim: #888880; --bg: #050505;
+      --accent: #7F77DD; --gold: #C8A96E;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--white); font-family: 'Cormorant Garamond', Georgia, serif; overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03; pointer-events: none; z-index: 9999;
+    }
+    .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── NAV ── */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; padding: 1.8rem 4rem; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(5,5,5,0.97) 0%, transparent 100%); }
+    .nav-left { display: flex; flex-direction: column; gap: 0.2rem; }
+    .nav-parent { font-family: 'Cinzel', serif; font-size: 0.48rem; letter-spacing: 0.35em; color: var(--red-hi); text-decoration: none; text-transform: uppercase; transition: color 0.3s; }
+    .nav-parent:hover { color: var(--chrome); }
+    .nav-mark { font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.3em; color: var(--accent); text-decoration: none; }
+    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-tag { font-family: 'Cinzel', serif; font-size: 0.52rem; letter-spacing: 0.25em; color: var(--dim); text-transform: uppercase; }
+    #clerk-user-btn { display: flex; align-items: center; }
+
+    /* ── HERO ── */
+    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 7rem 2rem 4rem; position: relative; }
+    .hero::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: min(600px,90vw); height: min(600px,90vw); border-radius: 50%; background: radial-gradient(circle, rgba(127,119,221,0.08) 0%, transparent 70%); pointer-events: none; }
+    .hero-label { font-family: 'Cinzel', serif; font-size: 0.52rem; letter-spacing: 0.5em; color: var(--red-hi); text-transform: uppercase; margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 1s cubic-bezier(0.16,1,0.3,1) 0.3s forwards; }
+    .hero-title { font-family: 'Cinzel', serif; font-size: clamp(2.2rem,8vw,5rem); font-weight: 900; letter-spacing: 0.2em; color: var(--accent); line-height: 1; margin-bottom: 0.5rem; opacity: 0; animation: fadeUp 1s cubic-bezier(0.16,1,0.3,1) 0.5s forwards; }
+    .hero-sub { font-family: 'Cinzel', serif; font-size: clamp(0.48rem,1.5vw,0.65rem); letter-spacing: 0.4em; color: var(--dim); text-transform: uppercase; margin-bottom: 3rem; opacity: 0; animation: fadeUp 1s cubic-bezier(0.16,1,0.3,1) 0.7s forwards; }
+    .hero-statement { font-size: clamp(1rem,3vw,1.5rem); font-weight: 300; font-style: italic; line-height: 1.8; color: var(--white); opacity: 0; max-width: 600px; animation: fadeUp 1s cubic-bezier(0.16,1,0.3,1) 0.9s forwards; }
+    .hero-rule { width: 1px; height: 60px; background: linear-gradient(to bottom, transparent, var(--accent), transparent); margin: 3rem auto 0; opacity: 0; animation: fadeIn 1s ease 1.4s forwards; }
+
+    /* ── DIVIDER ── */
+    .section-divider { display: flex; align-items: center; gap: 1.5rem; padding: 0 2rem; margin: 5rem auto; max-width: 900px; width: 100%; }
+    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 0.5px; background: linear-gradient(to right, transparent, var(--accent) 40%, transparent); }
+    .section-divider span { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.4em; color: var(--accent); white-space: nowrap; }
+
+    /* ── PILLARS ── */
+    .pillars { padding: 0 2rem; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .pillars-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); border: 0.5px solid rgba(127,119,221,0.2); }
+    .pillar { padding: 3rem 2rem; border-right: 0.5px solid rgba(127,119,221,0.12); position: relative; overflow: hidden; transition: background 0.4s; }
+    .pillar:last-child { border-right: none; }
+    .pillar::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, var(--accent), transparent); transform: scaleX(0); transition: transform 0.5s cubic-bezier(0.16,1,0.3,1); }
+    .pillar:hover { background: rgba(127,119,221,0.03); }
+    .pillar:hover::before { transform: scaleX(1); }
+    .pillar-icon { font-family: 'Cinzel', serif; font-size: 0.5rem; letter-spacing: 0.3em; color: var(--accent); margin-bottom: 1.5rem; display: block; opacity: 0.7; }
+    .pillar-title { font-family: 'Cinzel', serif; font-size: 0.88rem; font-weight: 600; letter-spacing: 0.18em; color: var(--chrome); margin-bottom: 1rem; text-transform: uppercase; }
+    .pillar-text { font-size: 0.92rem; font-weight: 300; line-height: 1.9; color: var(--dim); font-style: italic; }
+
+    /* ── TIERS ── */
+    .tiers { max-width: 800px; margin: 0 auto; padding: 0 2rem 7rem; width: 100%; }
+    .tier { display: flex; align-items: flex-start; gap: 2rem; padding: 2.5rem 0; border-bottom: 0.5px solid rgba(127,119,221,0.1); }
+    .tier:last-child { border-bottom: none; }
+    .tier-num { font-family: 'Cinzel', serif; font-size: 0.5rem; letter-spacing: 0.3em; color: var(--accent); min-width: 48px; padding-top: 0.2rem; }
+    .tier-title { font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.2em; color: var(--chrome); margin-bottom: 0.6rem; text-transform: uppercase; }
+    .tier-text { font-size: 0.92rem; font-weight: 300; font-style: italic; line-height: 1.9; color: var(--dim); }
+
+    /* ── PORTAL WRAPPER ── */
+    .portal-wrap { max-width: 960px; margin: 0 auto; padding: 0 2rem 8rem; width: 100%; }
+
+    /* ── SIGN-IN GATE (always visible until Clerk confirms signed-in) ── */
+    #portalGate { border: 0.5px solid rgba(127,119,221,0.25); padding: 4rem 3rem; position: relative; text-align: center; }
+    #portalGate::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 50%; height: 1px; background: linear-gradient(to right, transparent, var(--accent), transparent); }
+    .gate-title { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.4em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.8rem; }
+    .gate-sub { font-size: 0.88rem; font-weight: 300; font-style: italic; color: var(--dim); margin-bottom: 2.5rem; line-height: 1.7; }
+    #clerk-sign-in { display: flex; justify-content: center; }
+
+    /* ── ONBOARDING OVERLAY ── */
+    #onboardingOverlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(5,5,5,0.96); align-items: center; justify-content: center; padding: 2rem;
+    }
+    #onboardingOverlay.open { display: flex; }
+    .onboard-box { border: 0.5px solid rgba(127,119,221,0.35); max-width: 560px; width: 100%; position: relative; }
+    .onboard-box::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 50%; height: 1px; background: linear-gradient(to right, transparent, var(--accent), transparent); }
+    .onboard-header { padding: 2.5rem 2.5rem 1.5rem; border-bottom: 0.5px solid rgba(127,119,221,0.15); }
+    .onboard-title { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.4em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.5rem; }
+    .onboard-sub { font-size: 0.88rem; font-style: italic; color: var(--dim); line-height: 1.7; }
+    .onboard-body { padding: 2rem 2.5rem; }
+    .onboard-label { font-family: 'Cinzel', serif; font-size: 0.48rem; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
+    .division-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .division-btn {
+      background: transparent; border: 0.5px solid rgba(127,119,221,0.25);
+      color: var(--dim); font-family: 'Cinzel', serif; font-size: 0.55rem;
+      letter-spacing: 0.2em; padding: 1.2rem 1rem; cursor: pointer;
+      text-transform: uppercase; transition: all 0.3s; text-align: left;
+    }
+    .division-btn span { display: block; font-size: 0.78rem; color: var(--chrome); margin-bottom: 0.3rem; letter-spacing: 0.15em; }
+    .division-btn:hover, .division-btn.selected { border-color: var(--accent); background: rgba(127,119,221,0.06); color: var(--accent); }
+    .division-btn.selected span { color: var(--accent); }
+    .onboard-input { background: transparent; border: 0.5px solid rgba(127,119,221,0.3); color: var(--white); font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.2em; padding: 1rem 1.2rem; outline: none; transition: border-color 0.3s; width: 100%; margin-bottom: 1.5rem; }
+    .onboard-input::placeholder { color: var(--dim); }
+    .onboard-input:focus { border-color: var(--accent); }
+    .onboard-submit { background: transparent; border: 0.5px solid var(--accent); color: var(--accent); font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.4em; padding: 1rem; cursor: pointer; text-transform: uppercase; transition: background 0.3s, color 0.3s; width: 100%; }
+    .onboard-submit:hover { background: var(--accent); color: var(--bg); }
+    .onboard-error { font-family: 'Cinzel', serif; font-size: 0.48rem; letter-spacing: 0.2em; color: var(--red-hi); display: none; margin-top: 0.8rem; text-align: center; }
+    .onboard-error.show { display: block; }
+
+    /* ── DASHBOARD ── */
+    #portalDash { display: none; }
+    #portalDash.visible { display: block; }
+
+    /* Admin crown indicator */
+    .admin-badge { display: inline-flex; align-items: center; gap: 0.6rem; border: 0.5px solid rgba(200,169,110,0.4); padding: 0.4rem 0.9rem; margin-bottom: 1rem; }
+    .admin-badge-text { font-family: 'Cinzel', serif; font-size: 0.45rem; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; }
+
+    .dash-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 2rem 0; border-bottom: 0.5px solid rgba(127,119,221,0.2); margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem; }
+    .dash-welcome { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--accent); text-transform: uppercase; }
+    .dash-name { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.2em; color: var(--chrome); margin-top: 0.3rem; }
+
+    /* Tab nav */
+    .dash-tabs { display: flex; gap: 0; border-bottom: 0.5px solid rgba(127,119,221,0.2); margin-bottom: 3rem; flex-wrap: wrap; }
+    .dash-tab { font-family: 'Cinzel', serif; font-size: 0.5rem; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; padding: 1rem 1.5rem; cursor: pointer; border-bottom: 1px solid transparent; transition: color 0.3s, border-color 0.3s; background: none; border-top: none; border-left: none; border-right: none; }
+    .dash-tab:hover { color: var(--chrome); }
+    .dash-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    /* Finance tab hidden unless permitted */
+    .dash-tab[data-tab="financials"] { display: none; }
+    .dash-tab[data-tab="financials"].permitted { display: block; }
+    /* Admin tab hidden unless admin */
+    .dash-tab[data-tab="admin"] { display: none; }
+    .dash-tab[data-tab="admin"].permitted { display: block; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Info grid */
+    .info-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; background: rgba(127,119,221,0.12); border: 0.5px solid rgba(127,119,221,0.2); margin-bottom: 3rem; }
+    .info-cell { background: var(--bg); padding: 2rem 1.8rem; }
+    .info-label { font-family: 'Cinzel', serif; font-size: 0.45rem; letter-spacing: 0.35em; color: var(--dim); text-transform: uppercase; margin-bottom: 0.6rem; }
+    .info-value { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.12em; color: var(--chrome); word-break: break-word; }
+
+    /* Tier badge */
+    .tier-badge { display: inline-flex; align-items: center; gap: 2rem; border: 0.5px solid rgba(127,119,221,0.3); padding: 1.5rem 2rem; flex-wrap: wrap; margin-bottom: 3rem; }
+    .tier-badge-label { font-family: 'Cinzel', serif; font-size: 0.45rem; letter-spacing: 0.35em; color: var(--dim); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .tier-badge-value { font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.2em; color: var(--accent); }
+    .tier-badge-note { font-size: 0.85rem; font-style: italic; color: var(--dim); max-width: 300px; line-height: 1.6; }
+
+    /* Updates / task logs */
+    .section-label { font-family: 'Cinzel', serif; font-size: 0.52rem; letter-spacing: 0.4em; color: var(--dim); text-transform: uppercase; margin-bottom: 1.2rem; }
+    .log-list { margin-bottom: 3rem; }
+    .log-item { padding: 1.4rem 0; border-bottom: 0.5px solid rgba(127,119,221,0.1); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+    .log-item:last-child { border-bottom: none; }
+    .log-left {}
+    .log-date { font-family: 'Cinzel', serif; font-size: 0.44rem; letter-spacing: 0.2em; color: var(--dim); margin-bottom: 0.3rem; }
+    .log-text { font-size: 0.88rem; font-weight: 300; font-style: italic; line-height: 1.7; color: var(--chrome); }
+    .log-user { font-family: 'Cinzel', serif; font-size: 0.44rem; letter-spacing: 0.2em; color: var(--dim); text-align: right; white-space: nowrap; }
+
+    /* Locked notice */
+    .locked-notice { border: 0.5px solid rgba(127,119,221,0.15); padding: 2rem; text-align: center; margin-bottom: 2rem; }
+    .locked-notice p { font-family: 'Cinzel', serif; font-size: 0.5rem; letter-spacing: 0.28em; color: var(--dim); text-transform: uppercase; line-height: 1.8; }
+    .locked-notice span { color: var(--red-hi); }
+
+    /* ── ADMIN PANEL ── */
+    .admin-section { margin-bottom: 3rem; }
+    .admin-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; background: rgba(200,169,110,0.15); border: 0.5px solid rgba(200,169,110,0.25); margin-bottom: 2rem; }
+    .admin-cell { background: var(--bg); padding: 2rem 1.8rem; }
+    .admin-cell-label { font-family: 'Cinzel', serif; font-size: 0.45rem; letter-spacing: 0.35em; color: rgba(200,169,110,0.6); text-transform: uppercase; margin-bottom: 0.6rem; }
+    .admin-cell-value { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.12em; color: var(--gold); }
+
+    .admin-user-list { margin-bottom: 2rem; }
+    .admin-user-row { display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 1.2rem 0; border-bottom: 0.5px solid rgba(200,169,110,0.1); flex-wrap: wrap; }
+    .admin-user-row:last-child { border-bottom: none; }
+    .admin-user-name { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--chrome); }
+    .admin-user-email { font-size: 0.8rem; font-style: italic; color: var(--dim); margin-top: 0.2rem; }
+    .tier-select { background: transparent; border: 0.5px solid rgba(200,169,110,0.3); color: var(--gold); font-family: 'Cinzel', serif; font-size: 0.48rem; letter-spacing: 0.15em; padding: 0.5rem 0.8rem; cursor: pointer; outline: none; }
+    .tier-select option { background: #0a0a0a; }
+    .admin-save-btn { background: transparent; border: 0.5px solid rgba(200,169,110,0.4); color: var(--gold); font-family: 'Cinzel', serif; font-size: 0.44rem; letter-spacing: 0.25em; padding: 0.5rem 0.9rem; cursor: pointer; text-transform: uppercase; transition: background 0.3s; white-space: nowrap; }
+    .admin-save-btn:hover { background: rgba(200,169,110,0.1); }
+
+    /* Activity feed */
+    .activity-feed { margin-bottom: 3rem; }
+    .activity-item { display: flex; align-items: flex-start; gap: 1.2rem; padding: 1rem 0; border-bottom: 0.5px solid rgba(127,119,221,0.08); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-top: 0.4rem; flex-shrink: 0; }
+    .activity-dot.admin { background: var(--gold); }
+    .activity-content {}
+    .activity-time { font-family: 'Cinzel', serif; font-size: 0.42rem; letter-spacing: 0.2em; color: var(--dim); margin-bottom: 0.2rem; }
+    .activity-text { font-size: 0.85rem; font-style: italic; color: var(--chrome); line-height: 1.6; }
+
+    /* Profile section */
+    .profile-section { margin-bottom: 3rem; }
+    #clerk-user-profile { border: 0.5px solid rgba(127,119,221,0.15); }
+
+    /* ── FINANCIALS ── */
+    .finance-notice { border: 0.5px solid rgba(127,119,221,0.2); padding: 2.5rem; text-align: center; margin-bottom: 2rem; }
+    .finance-notice-title { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.35em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.8rem; }
+    .finance-notice-text { font-size: 0.88rem; font-style: italic; color: var(--dim); line-height: 1.7; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 0.5px solid rgba(127,119,221,0.15); padding: 2.5rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; margin-top: auto; }
+    .footer-back { font-family: 'Cinzel', serif; font-size: 0.52rem; letter-spacing: 0.3em; color: var(--dim); text-decoration: none; text-transform: uppercase; transition: color 0.3s; }
+    .footer-back:hover { color: var(--accent); }
+    .footer-copy { font-family: 'Cinzel', serif; font-size: 0.48rem; letter-spacing: 0.15em; color: rgba(136,136,128,0.35); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 600px) {
+      nav { padding: 1.2rem; }
+      .nav-tag { display: none; }
+      .pillars { padding: 0 1.2rem; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .pillar { border-right: none; border-bottom: 0.5px solid rgba(127,119,221,0.12); }
+      .pillar:last-child { border-bottom: none; }
+      .tiers { padding: 0 1.2rem 5rem; }
+      .tier { gap: 1.2rem; }
+      #portalGate { padding: 2.5rem 1.5rem; }
+      .info-grid, .admin-grid { grid-template-columns: 1fr; }
+      .onboard-body { padding: 1.5rem; }
+      .division-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; align-items: center; text-align: center; padding: 2rem 1.2rem; }
+    }
+    @media (min-width: 601px) and (max-width: 900px) {
+      .pillars-grid { grid-template-columns: 1fr; }
+      .pillar { border-right: none; border-bottom: 0.5px solid rgba(127,119,221,0.12); }
+      .pillar:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-left">
+      <a class="nav-parent" href="https://wearelvo.com">← LVO Holdings</a>
+      <a class="nav-mark" href="#">LVO Alliance</a>
+    </div>
+    <div class="nav-right">
+      <span class="nav-tag">Partnerships &amp; Capital</span>
+      <div id="clerk-user-btn"></div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-label">LVO Holdings · Division 03</p>
+    <h1 class="hero-title">Alliance</h1>
+    <p class="hero-sub">Partnerships · Capital · Joint Ventures</p>
+    <p class="hero-statement">Built on trust.<br/>Sealed in results.<br/>Access is earned, not given.</p>
+    <div class="hero-rule"></div>
+  </section>
+
+  <!-- WHAT WE DO -->
+  <div class="section-divider reveal"><span>What We Do</span></div>
+  <section class="pillars">
+    <div class="pillars-grid">
+      <div class="pillar reveal">
+        <span class="pillar-icon">Joint Ventures</span>
+        <p class="pillar-title">Deal Structuring</p>
+        <p class="pillar-text">Co-investment frameworks built for mutual benefit. Every deal is structured with protection on both sides.</p>
+      </div>
+      <div class="pillar reveal" style="transition-delay:0.15s">
+        <span class="pillar-icon">Capital</span>
+        <p class="pillar-title">Strategic Capital</p>
+        <p class="pillar-text">Deploying and attracting capital with precision. We don't chase profit — we position for it.</p>
+      </div>
+      <div class="pillar reveal" style="transition-delay:0.3s">
+        <span class="pillar-icon">Network</span>
+        <p class="pillar-title">Inner Circle</p>
+        <p class="pillar-text">A vetted network of partners, operators, and professionals. Relationships built over time, proven through results.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTNERSHIP TIERS -->
+  <div class="section-divider reveal"><span>Partnership Tiers</span></div>
+  <section class="tiers">
+    <div class="tier reveal">
+      <span class="tier-num">Tier I</span>
+      <div class="tier-content"><p class="tier-title">Principal</p><p class="tier-text">Founding members of LVO Holdings; equity holders in the parent entity with full governance rights and participation in profits. Restricted to family members only.</p></div>
+    </div>
+    <div class="tier reveal" style="transition-delay:0.1s">
+      <span class="tier-num">Tier II</span>
+      <div class="tier-content"><p class="tier-title">Associate</p><p class="tier-text">Trusted professionals in the LVO orbit. Attorneys, CPAs, contractors, lenders, and more. Preferred access with consistent business and no equity.</p></div>
+    </div>
+    <div class="tier reveal" style="transition-delay:0.2s">
+      <span class="tier-num">Tier III</span>
+      <div class="tier-content"><p class="tier-title">Partner</p><p class="tier-text">Co-investors brought in deal by deal through LVO Alliance. Earn deal-level equity. Advancement is based on performance, not position.</p></div>
+    </div>
+    <div class="tier reveal" style="transition-delay:0.3s">
+      <span class="tier-num">Tier IV</span>
+      <div class="tier-content"><p class="tier-title">Member</p><p class="tier-text">Starting position within the LVO community. Prove your worth and climb the ranks.</p></div>
+    </div>
+  </section>
+
+  <!-- INVESTOR PORTAL -->
+  <div class="section-divider reveal"><span>Investor Portal</span></div>
+  <section class="portal-wrap reveal">
+
+    <!-- SIGN-IN GATE — visible by default, hidden after Clerk confirms auth -->
+    <div id="portalGate">
+      <p class="gate-title">Alliance Portal Access</p>
+      <p class="gate-sub">Sign in to access your investor dashboard.<br/>New members are assigned Tier IV upon first sign-in.</p>
+      <div id="clerk-sign-in"></div>
+    </div>
+
+    <!-- DASHBOARD — hidden by default, shown after auth -->
+    <div id="portalDash">
+
+      <div class="dash-header">
+        <div>
+          <div id="adminBadge" class="admin-badge" style="display:none;">
+            <span class="admin-badge-text">⬡ LVO Administration · Executive Access</span>
+          </div>
+          <p class="dash-welcome">Welcome Back</p>
+          <p class="dash-name" id="dashName">—</p>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="dash-tabs">
+        <button class="dash-tab active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
+        <button class="dash-tab" data-tab="tasks" onclick="switchTab('tasks')">Task Log</button>
+        <button class="dash-tab" data-tab="financials" onclick="switchTab('financials')">Financials</button>
+        <button class="dash-tab" data-tab="profile" onclick="switchTab('profile')">Account</button>
+        <button class="dash-tab" data-tab="admin" onclick="switchTab('admin')">Admin Panel</button>
+      </div>
+
+      <!-- ── OVERVIEW TAB ── -->
+      <div id="tab-overview" class="tab-panel active">
+        <div class="tier-badge">
+          <div>
+            <p class="tier-badge-label">Current Standing</p>
+            <p class="tier-badge-value" id="dashTier">Tier IV — Member</p>
+          </div>
+          <p class="tier-badge-note">Tier advancement is reviewed and updated by LVO Holdings administration.</p>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-cell"><p class="info-label">Member Name</p><p class="info-value" id="dashName2">—</p></div>
+          <div class="info-cell"><p class="info-label">Email</p><p class="info-value" id="dashEmail">—</p></div>
+          <div class="info-cell"><p class="info-label">Division</p><p class="info-value" id="dashDivision">—</p></div>
+          <div class="info-cell"><p class="info-label">Member Since</p><p class="info-value" id="dashJoined">—</p></div>
+        </div>
+
+        <p class="section-label">Recent Activity</p>
+        <div class="activity-feed" id="activityFeed">
+          <p style="font-style:italic; color:var(--dim); font-size:0.88rem;">No recent activity recorded.</p>
+        </div>
+
+        <div class="locked-notice">
+          <p>Deal Flow · Equity Statements · Capital Reports<br/><span>Access Restricted</span> · Unlocked at Tier III and above</p>
+        </div>
+      </div>
+
+      <!-- ── TASK LOG TAB ── -->
+      <div id="tab-tasks" class="tab-panel">
+        <p class="section-label">Your Task Log</p>
+        <div class="log-list" id="taskLog">
+          <div class="log-item">
+            <div class="log-left">
+              <p class="log-date">April 2026</p>
+              <p class="log-text">Account created. Welcome to LVO Alliance. Awaiting division assignment confirmation and tier review from administration.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FINANCIALS TAB (permission-gated) ── -->
+      <div id="tab-financials" class="tab-panel">
+        <div class="finance-notice">
+          <p class="finance-notice-title">Capital & Financials Suite</p>
+          <p class="finance-notice-text">Deal flow summaries, equity positions, and capital deployment reports will appear here. This section is accessible to Tier III Partners and above.</p>
+        </div>
+        <div class="info-grid">
+          <div class="info-cell"><p class="info-label">Active Deals</p><p class="info-value" id="finDeals">—</p></div>
+          <div class="info-cell"><p class="info-label">Capital Deployed</p><p class="info-value" id="finCapital">—</p></div>
+          <div class="info-cell"><p class="info-label">Equity Positions</p><p class="info-value" id="finEquity">—</p></div>
+          <div class="info-cell"><p class="info-label">Last Updated</p><p class="info-value">April 2026</p></div>
+        </div>
+      </div>
+
+      <!-- ── ACCOUNT TAB ── -->
+      <div id="tab-profile" class="tab-panel">
+        <p class="section-label">Account Management</p>
+        <div class="profile-section">
+          <div id="clerk-user-profile"></div>
+        </div>
+      </div>
+
+      <!-- ── ADMIN TAB ── -->
+      <div id="tab-admin" class="tab-panel">
+        <p class="section-label">Executive Overview</p>
+        <div class="admin-grid">
+          <div class="admin-cell"><p class="admin-cell-label">Total Members</p><p class="admin-cell-value" id="adminTotal">—</p></div>
+          <div class="admin-cell"><p class="admin-cell-label">New This Month</p><p class="admin-cell-value" id="adminNew">—</p></div>
+          <div class="admin-cell"><p class="admin-cell-label">Active Divisions</p><p class="admin-cell-value">Vindex · Operations · Alliance</p></div>
+          <div class="admin-cell"><p class="admin-cell-label">Portal Version</p><p class="admin-cell-value">2.0 · April 2026</p></div>
+        </div>
+
+        <p class="section-label">Member Tier Management</p>
+        <div class="admin-user-list" id="adminUserList">
+          <p style="font-style:italic; color:var(--dim); font-size:0.88rem;">Loading member records…</p>
+        </div>
+
+        <p class="section-label">Admin Activity Feed</p>
+        <div class="activity-feed" id="adminActivityFeed">
+          <p style="font-style:italic; color:var(--dim); font-size:0.88rem;">No admin actions recorded yet.</p>
+        </div>
+      </div>
+
+    </div><!-- end #portalDash -->
+  </section>
+
+  <!-- ONBOARDING OVERLAY -->
+  <div id="onboardingOverlay">
+    <div class="onboard-box">
+      <div class="onboard-header">
+        <p class="onboard-title">Welcome to LVO Alliance</p>
+        <p class="onboard-sub">Before accessing your dashboard, select your division and confirm your role within the LVO network.</p>
+      </div>
+      <div class="onboard-body">
+        <span class="onboard-label">Select Your Division</span>
+        <div class="division-grid">
+          <button class="division-btn" onclick="selectDivision(this,'Vindex')"><span>Vindex</span>Real Estate</button>
+          <button class="division-btn" onclick="selectDivision(this,'Operations')"><span>Operations</span>Social Services</button>
+          <button class="division-btn" onclick="selectDivision(this,'Alliance')"><span>Alliance</span>Partnerships</button>
+          <button class="division-btn" onclick="selectDivision(this,'Holdings')"><span>Holdings</span>Executive / Corporate</button>
+        </div>
+        <span class="onboard-label">Your Role / Title</span>
+        <input class="onboard-input" id="onboardRole" type="text" placeholder="E.G. ATTORNEY, CPA, INVESTOR…"/>
+        <button class="onboard-submit" onclick="submitOnboarding()">Enter LVO Alliance →</button>
+        <p class="onboard-error" id="onboardError">Please select a division and enter your role.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <a class="footer-back" href="https://wearelvo.com">← wearelvo.com</a>
+    <span class="footer-copy">&copy; 2026 LVO Holdings · All Rights Reserved</span>
+  </footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONSTANTS & HELPERS
+// ═══════════════════════════════════════════
+const TIER_LABELS = { 1:'Tier I — Principal', 2:'Tier II — Associate', 3:'Tier III — Partner', 4:'Tier IV — Member' };
+
+// localStorage helpers
+function ls(key, fallback = '{}') { try { return JSON.parse(localStorage.getItem(key) || fallback); } catch(e) { return JSON.parse(fallback); } }
+function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+
+function getMeta(userId) { const d = ls('lvo_members'); return d[userId] || null; }
+function setMeta(userId, data) { const d = ls('lvo_members'); d[userId] = data; lsSet('lvo_members', d); }
+
+function getActivity() { return ls('lvo_activity', '[]'); }
+function logActivity(userId, name, action, isAdmin = false) {
+  const feed = getActivity();
+  feed.unshift({ userId, name, action, isAdmin, time: new Date().toISOString() });
+  lsSet('lvo_activity', feed.slice(0, 100)); // cap at 100
+}
+
+// ═══════════════════════════════════════════
+//  REVEAL ON SCROLL
+// ═══════════════════════════════════════════
+const reveals = document.querySelectorAll('.reveal');
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revObs.unobserve(e.target); } });
+}, { threshold: 0.08 });
+reveals.forEach(r => revObs.observe(r));
+
+// ═══════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.dash-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+}
+
+// ═══════════════════════════════════════════
+//  ONBOARDING
+// ═══════════════════════════════════════════
+let _selectedDivision = '';
+function selectDivision(btn, div) {
+  document.querySelectorAll('.division-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  _selectedDivision = div;
+}
+function submitOnboarding() {
+  const role = document.getElementById('onboardRole').value.trim();
+  const err  = document.getElementById('onboardError');
+  if (!_selectedDivision || !role) { err.classList.add('show'); return; }
+  err.classList.remove('show');
+
+  const userId = window._clerkUserId;
+  const meta = getMeta(userId) || {};
+  meta.division = _selectedDivision;
+  meta.role = role;
+  meta.onboarded = true;
+  setMeta(userId, meta);
+
+  logActivity(userId, window._clerkUserName, `Completed onboarding — Division: ${_selectedDivision}, Role: ${role}`);
+  document.getElementById('onboardingOverlay').classList.remove('open');
+  populateDashboard(window._clerkUser);
+}
+
+// ═══════════════════════════════════════════
+//  RBAC — CHECK ROLE FROM publicMetadata
+// ═══════════════════════════════════════════
+function getRole(user) {
+  // Set role via Clerk Dashboard → Users → publicMetadata → { "role": "admin" }
+  return user.publicMetadata?.role || 'member';
+}
+
+function getTier(userId) {
+  const meta = getMeta(userId);
+  return meta?.tier || 4;
+}
+
+// ═══════════════════════════════════════════
+//  POPULATE DASHBOARD
+// ═══════════════════════════════════════════
+function populateDashboard(user) {
+  const role    = getRole(user);
+  const isAdmin = role === 'admin';
+  const userId  = user.id;
+  const name    = user.fullName || user.firstName || 'Member';
+  const email   = user.primaryEmailAddress?.emailAddress || '—';
+  const joined  = user.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '—';
+  const meta    = getMeta(userId) || {};
+  const tier    = meta.tier || 4;
+  const division = meta.division || '—';
+
+  // Tier / division display
+  document.getElementById('dashName').textContent   = name;
+  document.getElementById('dashName2').textContent  = name;
+  document.getElementById('dashEmail').textContent  = email;
+  document.getElementById('dashJoined').textContent = joined;
+  document.getElementById('dashDivision').textContent = division;
+  document.getElementById('dashTier').textContent   = TIER_LABELS[tier] || TIER_LABELS[4];
+
+  // Admin badge
+  document.getElementById('adminBadge').style.display = isAdmin ? 'inline-flex' : 'none';
+
+  // Permission-gate: Financials tab (Tier I–III OR admin)
+  const canFinance = isAdmin || tier <= 3;
+  document.querySelector('.dash-tab[data-tab="financials"]').classList.toggle('permitted', canFinance);
+  if (canFinance) {
+    document.getElementById('finDeals').textContent   = isAdmin ? 'View All' : 'Assigned Only';
+    document.getElementById('finCapital').textContent = isAdmin ? 'Full Access' : 'Deal-Level';
+    document.getElementById('finEquity').textContent  = isAdmin ? 'Full Access' : 'Assigned Only';
+  }
+
+  // Permission-gate: Admin tab (admin role only)
+  document.querySelector('.dash-tab[data-tab="admin"]').classList.toggle('permitted', isAdmin);
+  if (isAdmin) renderAdminPanel(user);
+
+  // Activity feed (personal)
+  renderActivityFeed(userId);
+
+  // Log sign-in
+  logActivity(userId, name, 'Signed in to LVO Alliance portal', isAdmin);
+  renderActivityFeed(userId);
+}
+
+// ═══════════════════════════════════════════
+//  ACTIVITY FEED RENDER
+// ═══════════════════════════════════════════
+function renderActivityFeed(userId) {
+  const feed = getActivity().filter(a => a.userId === userId);
+  const el = document.getElementById('activityFeed');
+  if (!feed.length) { el.innerHTML = '<p style="font-style:italic;color:var(--dim);font-size:0.88rem;">No recent activity recorded.</p>'; return; }
+  el.innerHTML = feed.slice(0, 8).map(a => `
+    <div class="activity-item">
+      <div class="activity-dot${a.isAdmin ? ' admin' : ''}"></div>
+      <div class="activity-content">
+        <p class="activity-time">${new Date(a.time).toLocaleString('en-US', { dateStyle:'medium', timeStyle:'short' })}</p>
+        <p class="activity-text">${a.action}</p>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  ADMIN PANEL
+// ═══════════════════════════════════════════
+function renderAdminPanel(currentUser) {
+  const allMembers = ls('lvo_members');
+  const ids = Object.keys(allMembers);
+
+  // Stats
+  const now = new Date();
+  const thisMonth = ids.filter(id => {
+    const m = allMembers[id];
+    if (!m.joinedRaw) return false;
+    const d = new Date(m.joinedRaw);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+
+  document.getElementById('adminTotal').textContent = ids.length || '1';
+  document.getElementById('adminNew').textContent   = thisMonth || '—';
+
+  // Member list
+  const listEl = document.getElementById('adminUserList');
+  if (!ids.length) { listEl.innerHTML = '<p style="font-style:italic;color:var(--dim);font-size:0.88rem;">No members yet.</p>'; }
+  else {
+    listEl.innerHTML = ids.map(id => {
+      const m = allMembers[id];
+      const tierVal = m.tier || 4;
+      return `
+        <div class="admin-user-row" id="row-${id}">
+          <div>
+            <p class="admin-user-name">${m.name || 'Unknown'}</p>
+            <p class="admin-user-email">${m.email || ''} · ${m.division || '—'}</p>
+          </div>
+          <select class="tier-select" id="tierSel-${id}">
+            <option value="1" ${tierVal==1?'selected':''}>Tier I — Principal</option>
+            <option value="2" ${tierVal==2?'selected':''}>Tier II — Associate</option>
+            <option value="3" ${tierVal==3?'selected':''}>Tier III — Partner</option>
+            <option value="4" ${tierVal==4?'selected':''}>Tier IV — Member</option>
+          </select>
+          <button class="admin-save-btn" onclick="adminUpdateTier('${id}','${m.name || 'Member'}')">Save</button>
+        </div>`;
+    }).join('');
+  }
+
+  // Admin activity feed
+  const adminFeed = getActivity();
+  const adminFeedEl = document.getElementById('adminActivityFeed');
+  if (!adminFeed.length) return;
+  adminFeedEl.innerHTML = adminFeed.slice(0, 15).map(a => `
+    <div class="activity-item">
+      <div class="activity-dot${a.isAdmin ? ' admin' : ''}"></div>
+      <div class="activity-content">
+        <p class="activity-time">${new Date(a.time).toLocaleString('en-US', { dateStyle:'medium', timeStyle:'short' })} · ${a.name}</p>
+        <p class="activity-text">${a.action}</p>
+      </div>
+    </div>`).join('');
+}
+
+function adminUpdateTier(targetUserId, targetName) {
+  const sel = document.getElementById('tierSel-' + targetUserId);
+  const newTier = parseInt(sel.value);
+  const meta = getMeta(targetUserId) || {};
+  meta.tier = newTier;
+  setMeta(targetUserId, meta);
+  logActivity(window._clerkUserId, window._clerkUserName, `Updated ${targetName}'s tier to ${TIER_LABELS[newTier]}`, true);
+  renderAdminPanel(window._clerkUser);
+  // If the updated user is the current session, refresh their badge
+  if (targetUserId === window._clerkUserId) {
+    document.getElementById('dashTier').textContent = TIER_LABELS[newTier];
+  }
+}
+
+// ═══════════════════════════════════════════
+//  CLERK APPEARANCE
+// ═══════════════════════════════════════════
+const clerkAppearance = {
+  variables: {
+    colorBackground: '#050505', colorText: '#F0EEEC',
+    colorPrimary: '#7F77DD', colorInputBackground: 'transparent',
+    colorInputText: '#F0EEEC', borderRadius: '0px',
+    fontFamily: "'Cinzel', serif",
+  },
+  elements: {
+    card: { background: 'transparent', border: '0.5px solid rgba(127,119,221,0.25)', boxShadow: 'none', borderRadius: '0' },
+    headerTitle: { fontFamily: "'Cinzel', serif", letterSpacing: '0.2em', color: '#C8C8D0' },
+    headerSubtitle: { color: '#888880', fontStyle: 'italic' },
+    formFieldLabel: { color: '#888880', fontFamily: "'Cinzel', serif", letterSpacing: '0.12em', fontSize: '0.7rem' },
+    formFieldInput: { background: 'transparent', border: '0.5px solid rgba(127,119,221,0.35)', borderRadius: '0', color: '#F0EEEC', fontFamily: "'Cinzel', serif", letterSpacing: '0.1em' },
+    formButtonPrimary: { background: 'transparent', border: '0.5px solid #7F77DD', borderRadius: '0', color: '#7F77DD', fontFamily: "'Cinzel', serif", letterSpacing: '0.3em', textTransform: 'uppercase', boxShadow: 'none' },
+    footerActionLink: { color: '#7F77DD' },
+    dividerLine: { background: 'rgba(127,119,221,0.2)' },
+    dividerText: { color: '#888880' },
+    socialButtonsIconButton: { background: 'transparent', border: '0.5px solid rgba(127,119,221,0.25)', borderRadius: '0' },
+    avatarBox: { border: '0.5px solid rgba(127,119,221,0.4)', borderRadius: '0' },
+  }
+};
+
+// ═══════════════════════════════════════════
+//  CLERK INIT
+// ═══════════════════════════════════════════
+window.addEventListener('load', async () => {
+  await Clerk.load();
+
+  const gate    = document.getElementById('portalGate');
+  const dash    = document.getElementById('portalDash');
+  const signInEl = document.getElementById('clerk-sign-in');
+  const userBtnEl = document.getElementById('clerk-user-btn');
+  const profileEl = document.getElementById('clerk-user-profile');
+
+  let signInMounted  = false;
+  let userBtnMounted = false;
+  let profileMounted = false;
+
+  function showGate() {
+    gate.style.display = 'block';
+    dash.style.display = 'none';
+    userBtnEl.innerHTML = '';
+    userBtnMounted = false;
+    profileMounted = false;
+
+    if (!signInMounted) {
+      Clerk.mountSignIn(signInEl, { appearance: clerkAppearance, routing: 'virtual' });
+      signInMounted = true;
+    }
+  }
+
+  function showDash(user) {
+    gate.style.display  = 'none';
+    dash.style.display  = 'block';
+
+    // Store globally for helpers
+    window._clerkUser     = user;
+    window._clerkUserId   = user.id;
+    window._clerkUserName = user.fullName || user.firstName || 'Member';
+
+    // Ensure member record exists
+    let meta = getMeta(user.id);
+    if (!meta) {
+      meta = {
+        name: window._clerkUserName,
+        email: user.primaryEmailAddress?.emailAddress || '',
+        tier: 4,
+        division: null,
+        role: null,
+        onboarded: false,
+        joinedRaw: user.createdAt,
+      };
+      setMeta(user.id, meta);
+    }
+
+    // Mount UserButton
+    if (!userBtnMounted) {
+      Clerk.mountUserButton(userBtnEl, { appearance: clerkAppearance });
+      userBtnMounted = true;
+    }
+
+    // Mount UserProfile
+    if (!profileMounted) {
+      Clerk.mountUserProfile(profileEl, { appearance: clerkAppearance });
+      profileMounted = true;
+    }
+
+    // Onboarding check
+    if (!meta.onboarded && getRole(user) !== 'admin') {
+      _selectedDivision = '';
+      document.getElementById('onboardingOverlay').classList.add('open');
+    } else {
+      populateDashboard(user);
+    }
+  }
+
+  // Initial state
+  if (Clerk.user) {
+    showDash(Clerk.user);
+  } else {
+    showGate();
+  }
+
+  // Auth state listener
+  Clerk.addListener(({ user }) => {
+    signInMounted = false;
+    if (user) { showDash(user); } else { showGate(); }
+  });
+});
+</script>
+</body>
 </html>
